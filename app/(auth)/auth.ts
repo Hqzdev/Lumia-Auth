@@ -25,12 +25,7 @@ declare module 'next-auth' {
   }
 }
 
-export const {
-  handlers: { GET, POST },
-  auth,
-  signIn,
-  signOut,
-} = NextAuth({
+export const config = {
   ...authConfig,
   cookies: {
     sessionToken: {
@@ -104,4 +99,9 @@ export const {
       return session;
     },
   },
-});
+};
+
+const handler = NextAuth(config);
+
+export const { auth, signIn, signOut } = handler;
+export { handler };
