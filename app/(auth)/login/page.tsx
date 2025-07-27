@@ -16,6 +16,7 @@ import {
 } from '@/components/ui/tooltip';
 import { Mail, Eye, EyeOff } from 'lucide-react';
 import { signIn } from 'next-auth/react';
+import { useActionState } from 'react';
 import { login, type LoginActionState } from '../actions';
 
 export default function Page() {
@@ -32,47 +33,42 @@ export default function Page() {
   const [isNicknameLocked, setIsNicknameLocked] = useState(false);
   const [showPasswordEye, setShowPasswordEye] = useState(false);
   const [error, setError] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const [state, formAction] = useActionState<LoginActionState, FormData>(
+    login,
+    {
+      status: 'idle',
+    },
+  );
 
   useEffect(() => {
     setMounted(true);
-  }, []);
 
-  const handleSubmit = async (formData: FormData) => {
-    if (isSubmitting) return;
-    
-    setIsSubmitting(true);
-    setError('');
-    
-    try {
-      const result = await login({ status: 'idle' } as LoginActionState, formData);
-      
-      if (result.status === 'failed') {
-        setError('Incorrect nickname or password');
-        toast({
-          type: 'error',
-          description: 'Incorrect nickname or password',
-        });
-      } else if (result.status === 'invalid_data') {
-        setError('Failed to validate your submission!');
-        toast({
-          type: 'error',
-          description: 'Failed to validate your submission!',
-        });
-                   } else if (result.status === 'success') {
-               setError('');
-               setIsSuccessful(true);
-               window.location.href = 'https://chat.lumiaai.ru';
-             }
-    } catch (error) {
-      setError('An error occurred');
+    if (state.status === 'failed') {
+      setError('Incorrect nickname or password');
       toast({
         type: 'error',
-        description: 'An error occurred',
+        description: 'Incorrect nickname or password',
       });
-    } finally {
-      setIsSubmitting(false);
+    } else if (state.status === 'invalid_data') {
+      setError('Failed to validate your submission!');
+      toast({
+        type: 'error',
+        description: 'Failed to validate your submission!',
+      });
+    } else if (state.status === 'success') {
+      setError('');
+      setIsSuccessful(true);
+      // Redirect to external chat site after successful login
+      window.location.href = 'https://chat.lumiaai.ru';
     }
+  }, [state.status]);
+
+  const handleSubmit = (formData: FormData) => {
+    // This function is no longer used as the form is not connected to a backend action
+    // It's kept here for now, but will be removed if not used elsewhere.
+    console.log('Form submitted with data:', formData);
+    // Example: setIsSuccessful(true); // This would trigger the useEffect
   };
 
   const handleContinue = () => {
@@ -127,7 +123,7 @@ export default function Page() {
                 const formData = new FormData();
                 formData.append('nickname', nickname);
                 formData.append('password', password);
-                handleSubmit(formData);
+                formAction(formData);
               }
             }}
           >
@@ -274,14 +270,14 @@ export default function Page() {
           <div className="w-full flex flex-row justify-center gap-4 mt-4 text-xs text-gray-500">
             <button
               type="button"
-                              onClick={() => window.open('https://example.com/privacy', '_blank')}
+              onClick={() => router.push('/privacy')}
               className="hover:underline bg-transparent border-none p-0 m-0 text-inherit cursor-pointer w-40 h-8 rounded-full flex items-center justify-center"
             >
               Privacy Policy
             </button>
             <button
               type="button"
-                              onClick={() => window.open('https://example.com/policy', '_blank')}
+              onClick={() => router.push('/policy')}
               className="hover:underline bg-transparent border-none p-0 m-0 text-inherit cursor-pointer w-40 h-8 rounded-full flex items-center justify-center"
             >
               Terms of Service

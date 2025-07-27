@@ -1,6 +1,8 @@
+import { compare } from 'bcrypt-ts';
 import NextAuth, { DefaultSession } from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
 
+import { getUserByNickname } from '@/lib/db/queries';
 import { authConfig } from './auth.config';
 
 interface AppUser {
@@ -25,39 +27,13 @@ declare module 'next-auth' {
   }
 }
 
-export const config = {
+export const {
+  handlers: { GET, POST },
+  auth,
+  signIn,
+  signOut,
+} = NextAuth({
   ...authConfig,
-  cookies: {
-    sessionToken: {
-      name: `next-auth.session-token`,
-      options: {
-        httpOnly: true,
-        sameSite: 'lax',
-        path: '/',
-        domain: '.lumiaai.ru', // Общий домен для всех поддоменов
-        secure: process.env.NODE_ENV === 'production',
-      },
-    },
-    callbackUrl: {
-      name: `next-auth.callback-url`,
-      options: {
-        sameSite: 'lax',
-        path: '/',
-        domain: '.lumiaai.ru',
-        secure: process.env.NODE_ENV === 'production',
-      },
-    },
-    csrfToken: {
-      name: `next-auth.csrf-token`,
-      options: {
-        httpOnly: true,
-        sameSite: 'lax',
-        path: '/',
-        domain: '.lumiaai.ru',
-        secure: process.env.NODE_ENV === 'production',
-      },
-    },
-  },
   providers: [
     Credentials({
       credentials: {},
@@ -67,17 +43,24 @@ export const config = {
           password: string;
         };
 
-        // Временная простая аутентификация для тестирования
-        if (nickname === 'test' && password === 'test123') {
-          return {
-            id: '1',
-            nickname: 'test',
-            email: 'test@example.com',
-            subscription: 'free',
-          } as AppUser;
-        }
+        const users = await getUserByNickname(nickname);
 
-        return null;
+        if (users.length === 0) return null;
+
+        const user = users[0];
+
+        if (!user || !user.password) return null;
+
+        const passwordsMatch = await compare(password, user.password);
+        if (!passwordsMatch) return null;
+
+        // Важно: вернуть только нужные поля
+        return {
+          id: user.id,
+          nickname: user.nickname,
+          email: user.email,
+          subscription: user.subscription,
+        } as AppUser;
       },
     }),
   ],
@@ -99,9 +82,4 @@ export const config = {
       return session;
     },
   },
-};
-
-const handler = NextAuth(config);
-
-export const { auth, signIn, signOut } = handler;
-export { handler };
+});

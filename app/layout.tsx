@@ -1,6 +1,8 @@
+import { Toaster } from 'sonner';
 import type { Metadata } from 'next';
-import { Inter, JetBrains_Mono } from 'next/font/google';
-import { ClientProviders } from '@/components/client-providers';
+import { Geist, Geist_Mono } from 'next/font/google';
+import { ThemeProvider } from '@/components/theme-provider';
+import { SessionProvider } from 'next-auth/react';
 
 import './globals.css';
 
@@ -14,16 +16,16 @@ export const viewport = {
   maximumScale: 1, // Disable auto-zoom on mobile Safari
 };
 
-const inter = Inter({
+const geist = Geist({
   subsets: ['latin'],
   display: 'swap',
-  variable: '--font-inter',
+  variable: '--font-geist',
 });
 
-const jetbrainsMono = JetBrains_Mono({
+const geistMono = Geist_Mono({
   subsets: ['latin'],
   display: 'swap',
-  variable: '--font-jetbrains-mono',
+  variable: '--font-geist-mono',
 });
 
 const LIGHT_THEME_COLOR = 'hsl(0 0% 100%)';
@@ -55,7 +57,7 @@ export default function RootLayout({
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${inter.variable} ${jetbrainsMono.variable}`}
+      className={`${geist.variable} ${geistMono.variable}`}
     >
       <head>
         <link rel="icon" sizes="32x32" href="/icon.png" />
@@ -97,9 +99,17 @@ export default function RootLayout({
           </div>
         </noscript>
         {/* /Yandex.Metrika noscript */}
-        <ClientProviders>
-          {children}
-        </ClientProviders>
+        <SessionProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <Toaster position="top-center" />
+            {children}
+          </ThemeProvider>
+        </SessionProvider>
       </body>
     </html>
   );

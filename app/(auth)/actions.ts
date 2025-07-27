@@ -2,6 +2,8 @@
 
 import { z } from 'zod';
 
+import { createUser, getUserByEmail, getUserByNickname } from '@/lib/db/queries';
+
 import { signIn } from './auth';
 
 const authFormSchema = z.object({
@@ -34,17 +36,20 @@ export const login = async (
       password: formData.get('password'),
     });
 
-    // Временная простая аутентификация для тестирования
-    if (validatedData.nickname === 'test' && validatedData.password === 'test123') {
-      await signIn('credentials', {
-        nickname: validatedData.nickname,
-        password: validatedData.password,
-        redirect: false,
-      });
-      return { status: 'success' };
+    // Получаем пользователя по нику
+    const users = await getUserByNickname(validatedData.nickname);
+    if (!users.length) {
+      return { status: 'failed' };
     }
+    const user = users[0];
 
-    return { status: 'failed' };
+    await signIn('credentials', {
+      nickname: validatedData.nickname,
+      password: validatedData.password,
+      redirect: false,
+    });
+
+    return { status: 'success' };
   } catch (error) {
     if (error instanceof z.ZodError) {
       return { status: 'invalid_data' };
@@ -75,12 +80,15 @@ export const register = async (
       nickname: formData.get('nickname'),
     });
 
-    // Временная простая регистрация для тестирования
-    if (validatedData.nickname === 'test') {
-      return { status: 'nickname_exists' };
+    const [userByEmail] = await getUserByEmail(validatedData.email);
+    if (userByEmail) {
+      return { status: 'user_exists' } as RegisterActionState;
     }
-
-    // Симулируем успешную регистрацию
+    const [userByNickname] = await getUserByNickname(validatedData.nickname);
+    if (userByNickname) {
+      return { status: 'nickname_exists' } as RegisterActionState;
+    }
+    await createUser(validatedData.email, validatedData.password, validatedData.nickname);
     await signIn('credentials', {
       nickname: validatedData.nickname,
       password: validatedData.password,

@@ -1,3 +1,4 @@
+import Form from 'next/form';
 import { useState } from 'react';
 
 import { Input } from './ui/input';
@@ -79,7 +80,7 @@ export function AuthForm({
   };
 
   return (
-    <form action={action} className="flex flex-col gap-4 px-4 sm:px-16">
+    <Form action={action} className="flex flex-col gap-4 px-4 sm:px-16">
       {mode === 'register' && (
         <div className="flex flex-col gap-2">
           <Label
@@ -165,6 +166,6 @@ export function AuthForm({
         </div>
       </div>
       {children}
-    </form>
+    </Form>
   );
 }

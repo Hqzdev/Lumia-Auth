@@ -12,6 +12,7 @@ import {
   TooltipProvider,
 } from '@/components/ui/tooltip';
 import { register, type RegisterActionState } from '../actions';
+import { useActionState } from 'react';
 import Link from 'next/link';
 import { GoogleIcon, AppleIcon, PhoneIcon } from '@/components/icons';
 
@@ -29,11 +30,38 @@ export default function Page() {
   const [isLocked, setIsLocked] = useState(false);
   const [showPasswordEye, setShowPasswordEye] = useState(false);
   const [error, setError] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const [state, formAction] = useActionState<RegisterActionState, FormData>(
+    register,
+    {
+      status: 'idle',
+    },
+  );
 
   useEffect(() => {
     setMounted(true);
-  }, []);
+    if (state.status === 'user_exists') {
+      setError('User with this email already exists');
+      toast({ type: 'error', description: 'Account already exists!' });
+    } else if (state.status === 'nickname_exists') {
+      setError('Nickname is already taken');
+      toast({ type: 'error', description: 'Nickname already taken!' });
+    } else if (state.status === 'failed') {
+      setError('Failed to create account');
+      toast({ type: 'error', description: 'Failed to create account!' });
+    } else if (state.status === 'invalid_data') {
+      setError('Validation error');
+      toast({
+        type: 'error',
+        description: 'Failed validating your submission!',
+      });
+    } else if (state.status === 'success') {
+      setError('');
+      setIsSuccessful(true);
+      // Redirect to external chat site after successful registration
+      window.location.href = 'https://chat.lumiaai.ru';
+    }
+  }, [state.status]);
 
   if (!mounted) return null;
 
@@ -54,51 +82,14 @@ export default function Page() {
     setTimeout(() => passwordInputRef.current?.blur(), 200);
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!nickname || !email || !password || isSubmitting) return;
-    
-    setIsSubmitting(true);
-    setError('');
-    
+    if (!nickname || !email || !password) return;
     const formData = new FormData();
     formData.append('nickname', nickname);
     formData.append('email', email);
     formData.append('password', password);
-    
-    try {
-      const result = await register({ status: 'idle' } as RegisterActionState, formData);
-      
-      if (result.status === 'user_exists') {
-        setError('User with this email already exists');
-        toast({ type: 'error', description: 'Account already exists!' });
-      } else if (result.status === 'nickname_exists') {
-        setError('Nickname is already taken');
-        toast({ type: 'error', description: 'Nickname already taken!' });
-      } else if (result.status === 'failed') {
-        setError('Failed to create account');
-        toast({ type: 'error', description: 'Failed to create account!' });
-      } else if (result.status === 'invalid_data') {
-        setError('Validation error');
-        toast({
-          type: 'error',
-          description: 'Failed validating your submission!',
-        });
-               } else if (result.status === 'success') {
-           setError('');
-           setIsSuccessful(true);
-           window.location.href = 'https://chat.lumiaai.ru';
-
-      }
-    } catch (error) {
-      setError('An error occurred');
-      toast({
-        type: 'error',
-        description: 'An error occurred',
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
+    formAction(formData);
   };
 
   const handleNavigateLogin = (e: React.MouseEvent) => {
@@ -292,14 +283,14 @@ export default function Page() {
           <div className="w-full flex flex-row justify-center gap-4 mt-4 text-xs text-gray-500">
             <button
               type="button"
-                              onClick={() => window.open('https://example.com/privacy', '_blank')}
+              onClick={() => router.push('/privacy')}
               className="hover:underline bg-transparent border-none p-0 m-0 text-inherit cursor-pointer w-40 h-8 rounded-full flex items-center justify-center"
             >
               Privacy Policy
             </button>
             <button
               type="button"
-                              onClick={() => window.open('https://example.com/policy', '_blank')}
+              onClick={() => router.push('/policy')}
               className="hover:underline bg-transparent border-none p-0 m-0 text-inherit cursor-pointer w-40 h-8 rounded-full flex items-center justify-center"
             >
               Terms of Service
