@@ -18,7 +18,6 @@ export const user = pgTable('User', {
   nickname: varchar('nickname', { length: 32 }).notNull().unique(),
   subscription: varchar('subscription', { length: 20 }).notNull().default('free'),
   customization: json('customization'),
-  lastLoginAt: timestamp('lastLoginAt'),
 });
 
 export type User = InferSelectModel<typeof user>;

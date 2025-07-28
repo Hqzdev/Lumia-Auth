@@ -1,4 +1,11 @@
 {
+  "/api/auth/route": "app/api/auth/route.js",
   "/favicon.ico/route": "app/favicon.ico/route.js",
-  "/page": "app/page.js"
+  "/icon.png/route": "app/icon.png/route.js",
+  "/_not-found/page": "app/_not-found/page.js",
+  "/(auth)/login/page": "app/(auth)/login/page.js",
+  "/page": "app/page.js",
+  "/(auth)/register/page": "app/(auth)/register/page.js",
+  "/policy/page": "app/policy/page.js",
+  "/privacy/page": "app/privacy/page.js"
 }

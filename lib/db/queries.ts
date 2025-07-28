@@ -409,21 +409,3 @@ export async function updateUserCustomization({ userId, customization }: { userI
     throw error;
   }
 }
-
-export async function updateUserLastLogin(userId: string) {
-  try {
-    const result = await db.update(user)
-      .set({ lastLoginAt: new Date() })
-      .where(eq(user.id, userId))
-      .returning();
-    
-    if (!result || result.length === 0) {
-      throw new Error(`User with id ${userId} not found`);
-    }
-    
-    return result[0];
-  } catch (error) {
-    console.error('Failed to update user last login time in database', error);
-    throw error;
-  }
-}
