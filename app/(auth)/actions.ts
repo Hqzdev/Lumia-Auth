@@ -2,7 +2,7 @@
 
 import { z } from 'zod';
 
-import { createUser, getUserByEmail, getUserByNickname } from '@/lib/db/queries';
+import { createUser, getUserByEmail, getUserByNickname, updateUserLastLogin } from '@/lib/db/queries';
 
 import { signIn } from './auth';
 
@@ -49,6 +49,9 @@ export const login = async (
       redirect: false,
     });
 
+    // Обновляем время последнего входа при успешной аутентификации
+    await updateUserLastLogin(user.id);
+
     return { status: 'success' };
   } catch (error) {
     if (error instanceof z.ZodError) {
@@ -94,6 +97,12 @@ export const register = async (
       password: validatedData.password,
       redirect: false,
     });
+
+    // Получаем созданного пользователя для обновления времени входа
+    const [newUser] = await getUserByNickname(validatedData.nickname);
+    if (newUser) {
+      await updateUserLastLogin(newUser.id);
+    }
 
     return { status: 'success' };
   } catch (error) {
