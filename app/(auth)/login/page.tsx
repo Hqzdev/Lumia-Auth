@@ -4,8 +4,10 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState, useRef } from 'react';
 import { toast } from '@/components/toast';
+import { getField, saveField } from '@/lib/cookies';
 
 import { AuthForm } from '@/components/auth-form';
+import { CookieManager } from '@/components/cookie-manager';
 import { SubmitButton } from '@/components/submit-button';
 import { Button } from '@/components/ui/button';
 import {
@@ -44,6 +46,12 @@ export default function Page() {
   useEffect(() => {
     setMounted(true);
 
+    // Загружаем сохраненные данные из куки при монтировании компонента
+    const savedNickname = getField('nickname');
+    if (savedNickname) {
+      setNickname(savedNickname);
+    }
+
     if (state.status === 'failed') {
       setError('Incorrect nickname or password');
       toast({
@@ -59,10 +67,14 @@ export default function Page() {
     } else if (state.status === 'success') {
       setError('');
       setIsSuccessful(true);
+      // Сохраняем nickname в куки при успешном входе
+      if (nickname) {
+        saveField('nickname', nickname);
+      }
       // Redirect to external chat site after successful login
       window.location.href = 'https://chat.lumiaai.ru';
     }
-  }, [state.status]);
+  }, [state.status, nickname]);
 
   const handleSubmit = (formData: FormData) => {
     // This function is no longer used as the form is not connected to a backend action
@@ -137,7 +149,14 @@ export default function Page() {
                 required
                 className="w-80 h-14 rounded-full border border-gray-200 px-6 text-base outline-none focus:ring-0 transition pr-24 disabled:bg-gray-100"
                 value={nickname}
-                onChange={(e) => setNickname(e.target.value)}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  setNickname(value);
+                  // Сохраняем nickname в куки при вводе
+                  if (value.trim()) {
+                    saveField('nickname', value);
+                  }
+                }}
                 disabled={isNicknameLocked || isLoading}
               />
               {isLoading && (
@@ -284,6 +303,7 @@ export default function Page() {
             </button>
           </div>
         </div>
+        <CookieManager />
       </div>
     </TooltipProvider>
   );

@@ -12,9 +12,10 @@
       "static/chunks/4bd1b696-2385f465b218746f.js",
       "static/chunks/964-caec2b4b91393445.js",
       "static/chunks/main-app-8acf802f717d3ee6.js",
-      "static/css/c5b64a153049b0af.css",
+      "static/css/02612b22ba036aa3.css",
+      "static/chunks/455-86805ffaee79fe5f.js",
       "static/chunks/671-e79556fe41e83d21.js",
-      "static/chunks/app/layout-0564f4bf1a193ed4.js"
+      "static/chunks/app/layout-61edb7b4ff1215b9.js"
     ],
     "/api/auth/route": [
       "static/chunks/webpack-b20247dafd2abc7f.js",
@@ -30,9 +31,9 @@
       "static/chunks/main-app-8acf802f717d3ee6.js",
       "static/chunks/455-86805ffaee79fe5f.js",
       "static/chunks/671-e79556fe41e83d21.js",
-      "static/chunks/920-f0b3385452141fb6.js",
-      "static/chunks/41-7f1d559c51ae7cee.js",
-      "static/chunks/app/(auth)/login/page-875d649534f50a75.js"
+      "static/chunks/940-5e0123e7b1576de2.js",
+      "static/chunks/844-2c1849fc44b5e492.js",
+      "static/chunks/app/(auth)/login/page-c4c6e69a8baed60a.js"
     ],
     "/(auth)/register/page": [
       "static/chunks/webpack-b20247dafd2abc7f.js",
@@ -42,9 +43,9 @@
       "static/chunks/455-86805ffaee79fe5f.js",
       "static/chunks/671-e79556fe41e83d21.js",
       "static/chunks/874-437a265a67d6cfee.js",
-      "static/chunks/920-f0b3385452141fb6.js",
-      "static/chunks/41-7f1d559c51ae7cee.js",
-      "static/chunks/app/(auth)/register/page-957581ddb17481f5.js"
+      "static/chunks/940-5e0123e7b1576de2.js",
+      "static/chunks/844-2c1849fc44b5e492.js",
+      "static/chunks/app/(auth)/register/page-66eff8834780698c.js"
     ],
     "/page": [
       "static/chunks/webpack-b20247dafd2abc7f.js",
@@ -59,7 +60,7 @@
       "static/chunks/964-caec2b4b91393445.js",
       "static/chunks/main-app-8acf802f717d3ee6.js",
       "static/chunks/874-437a265a67d6cfee.js",
-      "static/chunks/app/policy/page-9436df661384b709.js"
+      "static/chunks/app/policy/page-855e04e25f54d0d9.js"
     ],
     "/privacy/page": [
       "static/chunks/webpack-b20247dafd2abc7f.js",

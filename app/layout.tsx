@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import { ThemeProvider } from '@/components/theme-provider';
 import { SessionProvider } from 'next-auth/react';
+import { CookieNotice } from '@/components/cookie-notice';
 
 import './globals.css';
 
@@ -108,6 +109,7 @@ export default function RootLayout({
           >
             <Toaster position="top-center" />
             {children}
+            <CookieNotice />
           </ThemeProvider>
         </SessionProvider>
       </body>
